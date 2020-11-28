@@ -1,0 +1,44 @@
+version: '3.7'
+
+networks:
+  backend:
+
+services:
+  nginx:
+    volumes:
+      -  ./nginx:/var/www
+    image: 'nginx:latest'
+    ports:
+      - "80:80"
+      - "433:433"
+    networks:
+      -  backend
+  mysql:
+    volumes:
+      -  ./mysql:/var/lib/mysql
+      -  ./mysql/conf.d:/etc/mysql/conf.d
+    container_name: mysql
+    image: 'mysql'
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    depends_on:
+      -  nginx
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABSE: db_1
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pwdpwd
+    ports:
+      -  "3306:3306"
+    networks:
+      -  backend
+  phpfpm:
+    volumes:
+      -  ./php-fpm:/var/www
+    image: 'bitnami/php-fpm:latest'
+    depends_on:
+      -  nginx
+    networks:
+      - backend
+    ports:
+      -  "9000:9000"
