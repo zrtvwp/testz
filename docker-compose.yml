@@ -9,6 +9,9 @@ services:
       -  ./nginx:/var/www
       -  ./nginx/conf.d:/etc/nginx/conf.d
     image: 'nginx:latest'
+    depends_on: 
+      -  mysql
+      -  phpfpm
     ports:
       - "80:80"
       - "433:433"
@@ -22,8 +25,6 @@ services:
     image: 'mysql'
     command: --default-authentication-plugin=mysql_native_password
     restart: always
-    depends_on:
-      -  nginx
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABSE: db_1
@@ -37,8 +38,6 @@ services:
     volumes:
       -  ./php-fpm:/var/www
     image: 'bitnami/php-fpm:latest'
-    depends_on:
-      -  nginx
     networks:
       - backend
     ports:
